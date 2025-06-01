@@ -14,14 +14,14 @@ type BlogData = {
 };
 
 interface BlogProps {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }
 
 export default async function Blog({ params }: BlogProps) {
-  const { id } = await params;
+  const { id } = params; 
 
   if (!id) {
-    notFound(); 
+    notFound();
   }
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/content/${id}`);
@@ -38,7 +38,7 @@ export default async function Blog({ params }: BlogProps) {
   const blog: BlogData = data.blog || data;
 
   if (!blog) {
-    notFound(); 
+    notFound();
   }
 
   return (
