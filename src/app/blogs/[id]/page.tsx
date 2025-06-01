@@ -35,21 +35,20 @@ export default async function Blog({ params }: BlogProps) {
   }
 
   const data = await res.json();
-  // Defensive assignment with fallback values
+
   const blog: BlogData = {
-    id: data.blog?.id ?? data.id ?? "",
-    title: data.blog?.title ?? data.title ?? "",
-    description: data.blog?.description ?? data.description ?? "",
-    blogImage: data.blog?.blogImage ?? data.blogImage ?? "",
+    id: String(data.blog?.id ?? data.id ?? ""),
+    title: String(data.blog?.title ?? data.title ?? ""),
+    description: String(data.blog?.description ?? data.description ?? ""),
+    blogImage: String(data.blog?.blogImage ?? data.blogImage ?? ""),
     tags: Array.isArray(data.blog?.tags)
       ? data.blog.tags.filter((t: any) => typeof t === "string")
       : Array.isArray(data.tags)
       ? data.tags.filter((t: any) => typeof t === "string")
       : [],
-    time: data.blog?.time ?? data.time ?? "",
-    date: data.blog?.date ?? data.date ?? "",
+    time: String(data.blog?.time ?? data.time ?? ""),
+    date: String(data.blog?.date ?? data.date ?? ""),
   };
-
 
   if (!blog.id) {
     notFound();
@@ -58,7 +57,6 @@ export default async function Blog({ params }: BlogProps) {
   return (
     <div className="min-h-screen bg-gray-50 text-black py-12 px-4 flex justify-center">
       <div className="w-full max-w-6xl space-y-6">
-        {/* Back Button */}
         <Link
           href="/blogs"
           className="inline-flex items-center text-sm text-gray-600 hover:underline"
@@ -66,17 +64,11 @@ export default async function Blog({ params }: BlogProps) {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Blogs
         </Link>
-
-        {/* Title */}
         <h1 className="text-4xl font-bold text-gray-900">{blog.title || "Untitled"}</h1>
-
-        {/* Date & Time */}
         <div className="text-gray-600 text-sm flex justify-between">
           <span>{blog.date || "No date"}</span>
           <span>{blog.time || ""}</span>
         </div>
-
-        {/* Blog Image */}
         {blog.blogImage ? (
           <Image
             src={blog.blogImage}
@@ -90,13 +82,9 @@ export default async function Blog({ params }: BlogProps) {
             <span className="text-gray-500">No Image Available</span>
           </div>
         )}
-
-        {/* Description */}
         <p className="text-lg leading-8 whitespace-pre-line">
           {blog.description || "No description available."}
         </p>
-
-        {/* Tags */}
         {Array.isArray(blog.tags) && blog.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-6">
             {blog.tags.map((tag, i) => (
