@@ -18,7 +18,7 @@ interface BlogProps {
 }
 
 export default async function Blog({ params }: BlogProps) {
-  const { id } = params;
+  const { id } = await params;
 
   if (!id) {
     console.error("Missing blog ID");
