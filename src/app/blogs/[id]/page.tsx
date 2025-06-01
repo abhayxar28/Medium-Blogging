@@ -17,8 +17,10 @@ interface BlogProps {
   params: { id: string };
 }
 
+export const dynamic = "force-dynamic"; 
+
 export default async function Blog({ params }: BlogProps) {
-  const { id } = await params;
+  const { id } = params;
 
   if (!id) {
     console.error("Missing blog ID");
@@ -26,11 +28,15 @@ export default async function Blog({ params }: BlogProps) {
   }
 
   let blog: BlogData | null = null;
+
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/content/${id}`);
+    // Fetch blog data from the API
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/content/${id}`, {
+      next: { revalidate: 60 }, // Optional: Cache for 60 seconds in production
+    });
 
     if (!res.ok) {
-      console.error("Failed to fetch blog:", res.status, res.statusText);
+      console.error(`Failed to fetch blog. Status: ${res.status}, Message: ${res.statusText}`);
       return (
         <div className="min-h-screen flex items-center justify-center bg-white text-red-500 p-10">
           Failed to load blog
@@ -40,24 +46,26 @@ export default async function Blog({ params }: BlogProps) {
 
     const data = await res.json();
 
+    // Validate the response structure
     if (!data || (!data.blog && typeof data !== "object")) {
       console.error("Invalid blog data:", data);
       notFound();
     }
 
     blog = data.blog || data;
+
+    // Check for essential fields in the blog
+    if (!blog || !blog.title || !blog.description) {
+      console.error("Incomplete blog data:", blog);
+      notFound();
+    }
   } catch (error) {
-    console.error("Error fetching blog:", error);
+    console.error("Error fetching blog data:", error);
     return (
       <div className="min-h-screen flex items-center justify-center bg-white text-red-500 p-10">
         Error loading blog
       </div>
     );
-  }
-
-  if (!blog) {
-    console.error("Blog not found");
-    notFound();
   }
 
   return (
