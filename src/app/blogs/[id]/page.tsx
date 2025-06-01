@@ -18,7 +18,8 @@ interface BlogProps {
 }
 
 export default async function Blog({ params }: BlogProps) {
-  const { id } = params; 
+  console.log("Params:", params); // Debugging
+  const { id } = params;
 
   if (!id) {
     notFound();
@@ -27,6 +28,7 @@ export default async function Blog({ params }: BlogProps) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/content/${id}`);
 
   if (!res.ok) {
+    console.error("Failed to fetch blog:", res.status, res.statusText);
     return (
       <div className="min-h-screen flex items-center justify-center bg-white text-red-500 p-10">
         Failed to load blog
@@ -35,6 +37,12 @@ export default async function Blog({ params }: BlogProps) {
   }
 
   const data = await res.json();
+
+  if (!data || (!data.blog && typeof data !== "object")) {
+    console.error("Invalid blog data:", data);
+    notFound();
+  }
+
   const blog: BlogData = data.blog || data;
 
   if (!blog) {
@@ -45,25 +53,18 @@ export default async function Blog({ params }: BlogProps) {
     <>
       <div className="min-h-screen bg-gray-50 text-black py-12 px-4 flex justify-center">
         <div className="w-full max-w-6xl space-y-6">
-          {/* Back Button */}
-          <Link
-            href="/blogs"
-            className="inline-flex items-center text-sm text-gray-600 hover:underline"
-          >
+          <Link href="/blogs" className="inline-flex items-center text-sm text-gray-600 hover:underline">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Blogs
           </Link>
 
-          {/* Title */}
           <h1 className="text-4xl font-bold text-gray-900">{blog.title}</h1>
 
-          {/* Date & Time */}
           <div className="text-gray-600 text-sm flex justify-between">
             <span>{blog.date}</span>
             <span>{blog.time}</span>
           </div>
 
-          {/* Blog Image */}
           {blog.blogImage ? (
             <Image
               src={blog.blogImage}
@@ -78,10 +79,8 @@ export default async function Blog({ params }: BlogProps) {
             </div>
           )}
 
-          {/* Description */}
           <p className="text-lg leading-8 whitespace-pre-line">{blog.description ?? ""}</p>
 
-          {/* Tags */}
           {Array.isArray(blog.tags) && blog.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-6">
               {blog.tags.map((tag) => (
