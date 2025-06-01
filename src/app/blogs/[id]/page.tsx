@@ -79,7 +79,7 @@ export default async function Blog({ params }: BlogProps) {
           )}
 
           {/* Description */}
-          <p className="text-lg leading-8 whitespace-pre-line">{blog.description}</p>
+          <p className="text-lg leading-8 whitespace-pre-line">{blog.description ?? ""}</p>
 
           {/* Tags */}
           {Array.isArray(blog.tags) && blog.tags.length > 0 && (
