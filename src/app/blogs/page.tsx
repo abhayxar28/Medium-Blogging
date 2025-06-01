@@ -9,6 +9,13 @@ type NavbarProps = {
 
 const Navbar = ({session}: NavbarProps) => {
   const id = session?.user.id
+  if (!session?.user?.id) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white text-red-500 p-10">
+        User not authenticated.
+      </div>
+    );
+  }
   return (
     <nav className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

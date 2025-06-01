@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-
+import { notFound } from "next/navigation";
 
 type BlogData = {
   id: string;
@@ -15,18 +13,18 @@ type BlogData = {
   date: string;
 };
 
-export default async function Blog() {
-  const session = await getServerSession(authOptions)
+interface BlogProps {
+  params: { id: string };
+}
 
-  if (!session?.user?.id) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white text-red-500 p-10">
-        User not authenticated.
-      </div>
-    );
+export default async function Blog({ params }: BlogProps) {
+  const { id } = await params;
+
+  if (!id) {
+    notFound(); 
   }
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/content/${session.user.id}`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/content/${id}`);
 
   if (!res.ok) {
     return (
@@ -40,11 +38,7 @@ export default async function Blog() {
   const blog: BlogData = data.blog || data;
 
   if (!blog) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white text-gray-600 p-10">
-        Blog not found.
-      </div>
-    );
+    notFound(); // Redirect to a 404 page if the blog is not found
   }
 
   return (
