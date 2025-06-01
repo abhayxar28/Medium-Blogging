@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import Head from "next/head";
 import Image from "next/image";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -18,7 +17,16 @@ type BlogData = {
 
 export default async function Blog() {
   const session = await getServerSession(authOptions)
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/content/${session?.user.id}`);
+
+  if (!session?.user?.id) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white text-red-500 p-10">
+        User not authenticated.
+      </div>
+    );
+  }
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/content/${session.user.id}`);
 
   if (!res.ok) {
     return (
@@ -41,13 +49,6 @@ export default async function Blog() {
 
   return (
     <>
-      <Head>
-        <title>{blog.title} | Medium</title>
-        <meta name="description" content={blog.description.slice(0, 150)} />
-        <meta property="og:title" content={blog.title} />
-        <meta property="og:image" content={blog.blogImage} />
-        <meta property="og:description" content={blog.description.slice(0, 150)} />
-      </Head>
       <div className="min-h-screen bg-gray-50 text-black py-12 px-4 flex justify-center">
         <div className="w-full max-w-6xl space-y-6">
           {/* Back Button */}
