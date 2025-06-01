@@ -89,7 +89,7 @@ export default async function Profile() {
                   <p className="text-sm text-gray-500 mb-3">
                     {blog.date} • {blog.time}
                   </p>
-                  <p className="text-gray-800 flex-grow">{blog.description.slice(0, 200)}...</p>
+                  <p className="text-gray-800 flex-grow">{blog.description && blog.description.length > 200 ? "..." : ""}</p>
                   <div className="flex flex-wrap gap-3 mt-4">
                     {blog.tags.map((tag, i) => (
                       <span
