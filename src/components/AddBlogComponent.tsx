@@ -4,14 +4,11 @@ import { addingBlogs } from '@/app/blogs/addblogs/actions';
 import { useRouter } from 'next/navigation';
 import React, { useState, useRef } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { Session } from 'next-auth';
+import { useSession } from 'next-auth/react';
 
-interface AddBlogComponentProps {
-  session: Session | null;
-}
-
-
-export default function AddBlogComponent({session}: AddBlogComponentProps) {
+1
+export default function AddBlogComponent() {
+  const session = useSession();
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -22,11 +19,11 @@ export default function AddBlogComponent({session}: AddBlogComponentProps) {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  if (!session || !session.user) {
+  if (!session.data || !session.data.user) {
     return <p>You must be signed in to add a blog.</p>;
   }
 
-  const userId = session.user.id;
+  const userId = session.data?.user.id;
 
   const handleAdd = async () => {
     if (!image) {
