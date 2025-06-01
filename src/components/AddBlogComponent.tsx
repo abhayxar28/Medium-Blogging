@@ -6,7 +6,6 @@ import React, { useState, useRef } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
-1
 export default function AddBlogComponent() {
   const session = useSession();
   const router = useRouter();
@@ -16,6 +15,7 @@ export default function AddBlogComponent() {
   const [newTag, setNewTag] = useState('');
   const [image, setImage] = useState<string | null>(null);
   const [time, setTime] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -31,18 +31,26 @@ export default function AddBlogComponent() {
       return;
     }
 
-    await addingBlogs({
-      title,
-      description,
-      date: new Date().toISOString().split('T')[0],
-      likes: 0,
-      tags,
-      time: time,
-      userId,
-      blogImage: image,
-    });
+    setIsLoading(true);
 
-    router.push('/blogs');
+    try {
+      await addingBlogs({
+        title,
+        description,
+        date: new Date().toISOString().split('T')[0],
+        likes: 0,
+        tags,
+        time,
+        userId,
+        blogImage: image,
+      });
+
+      router.push('/blogs');
+    } catch (error) {
+      alert("Failed to save the blog.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -170,12 +178,15 @@ export default function AddBlogComponent() {
         <div className="pt-4 text-center">
           <button
             onClick={handleAdd}
-            className="px-8 py-3 bg-black text-white rounded-full font-semibold hover:bg-gray-800 transition cursor-pointer"
+            className={`px-8 py-3 rounded-full font-semibold transition cursor-pointer ${
+              isLoading ? 'bg-gray-400 text-gray-700 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-800'
+            }`}
+            disabled={isLoading}
           >
-            Save Blog
+            {isLoading ? 'Saving...' : 'Save Blog'}
           </button>
         </div>
       </div>
     </div>
-  );
+  ); 
 }
