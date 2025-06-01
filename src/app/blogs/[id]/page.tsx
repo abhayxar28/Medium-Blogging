@@ -14,11 +14,11 @@ type BlogData = {
 };
 
 interface BlogProps {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }
 
 export default async function Blog({ params }: BlogProps) {
-  const { id } = await params;
+  const { id } = params;
 
   if (!id) {
     notFound();
@@ -36,18 +36,22 @@ export default async function Blog({ params }: BlogProps) {
 
   const data = await res.json();
 
+  if (!data || (!data.blog && !data.id)) {
+    notFound();
+  }
+
   const blog: BlogData = {
-    id: String(data.blog?.id ?? data.id ?? ""),
-    title: String(data.blog?.title ?? data.title ?? ""),
-    description: String(data.blog?.description ?? data.description ?? ""),
-    blogImage: String(data.blog?.blogImage ?? data.blogImage ?? ""),
-    tags: Array.isArray(data.blog?.tags)
+    id: String(data?.blog?.id ?? data?.id ?? ""),
+    title: String(data?.blog?.title ?? data?.title ?? ""),
+    description: String(data?.blog?.description ?? data?.description ?? ""),
+    blogImage: String(data?.blog?.blogImage ?? data?.blogImage ?? ""),
+    tags: Array.isArray(data?.blog?.tags)
       ? data.blog.tags.filter((t: any) => typeof t === "string")
-      : Array.isArray(data.tags)
+      : Array.isArray(data?.tags)
       ? data.tags.filter((t: any) => typeof t === "string")
       : [],
-    time: String(data.blog?.time ?? data.time ?? ""),
-    date: String(data.blog?.date ?? data.date ?? ""),
+    time: String(data?.blog?.time ?? data?.time ?? ""),
+    date: String(data?.blog?.date ?? data?.date ?? ""),
   };
 
   if (!blog.id) {
