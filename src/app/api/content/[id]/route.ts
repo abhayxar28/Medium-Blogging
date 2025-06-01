@@ -3,21 +3,18 @@ import prisma from "@/lib/prisma";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  const id  = (await params).id;
 
   if (!id) {
     return NextResponse.json({ error: "Missing ID" }, { status: 400 });
   }
 
   try {
-
     const blog = await prisma.blogs.findUnique({
-      where: {
-        id
-      }
-    })
+      where: { id }
+    });
 
     if (!blog) {
       return NextResponse.json({ error: "Blog not found" }, { status: 404 });
@@ -30,18 +27,24 @@ export async function GET(
   }
 }
 
-
-
-export async function DELETE(req: NextRequest) {
-  const id = req.nextUrl.pathname.split("/").pop();
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
 
   if (!id) {
     return NextResponse.json({ error: "Missing ID" }, { status: 400 });
   }
 
-  await prisma.blogs.delete({
-    where: { id }
-  });
+  try {
+    await prisma.blogs.delete({
+      where: { id }
+    });
 
-  return NextResponse.json({ message: "Blog deleted" });
+    return NextResponse.json({ message: "Blog deleted" });
+  } catch (error) {
+    console.error("Database delete error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }

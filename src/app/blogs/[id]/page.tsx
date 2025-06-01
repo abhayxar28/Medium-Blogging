@@ -14,7 +14,7 @@ type BlogData = {
 };
 
 interface BlogProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function Blog({ params }: BlogProps) {
